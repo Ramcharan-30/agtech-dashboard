@@ -3,19 +3,20 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 
-// Load environment variables
-dotenv.config();
+// Import Routes
+import competitorRoutes from './routes/competitorRoutes.js';
 
-// Connect to database
+dotenv.config();
 connectDB();
 
 const app = express();
 
-// Middleware
-app.use(cors()); // Allow cross-origin requests from our React app
-app.use(express.json()); // Allow our API to accept JSON data in the request body
+app.use(cors());
+app.use(express.json());
 
-// Basic test route
+// Mount Routes
+app.use('/api/competitors', competitorRoutes);
+
 app.get('/', (req, res) => {
   res.send('AgTech Market Intelligence API is running...');
 });
