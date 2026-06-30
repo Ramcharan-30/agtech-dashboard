@@ -7,6 +7,7 @@ const API = axios.create({
 
 // Export dedicated functions for our endpoints
 export const fetchCompetitors = () => API.get('/competitors');
+export const createCompetitor = (competitorData) => API.post('/competitors', competitorData); // ADDED THIS LINE
 
 export const generateSwotAnalysis = (competitorOneId, competitorTwoId) => 
   API.post('/swot/compare', { competitorOneId, competitorTwoId });
