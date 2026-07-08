@@ -1,56 +1,135 @@
+import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { FiPieChart, FiUsers, FiActivity } from 'react-icons/fi';
+import { FiPieChart, FiUsers, FiActivity, FiMenu, FiLogOut, FiChevronLeft, FiTrendingUp, FiBarChart2, FiSettings, FiBell } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
+import '../App.css';
 
 const DashboardLayout = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
+
+  // Persist sidebar state in localStorage
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const stored = localStorage.getItem('agtech_sidebar_collapsed');
+    return stored === 'true';
+  });
+
+  const [hasNotification] = useState(true);
+
+  useEffect(() => {
+    localStorage.setItem('agtech_sidebar_collapsed', isCollapsed);
+  }, [isCollapsed]);
+
+  const toggleSidebar = () => setIsCollapsed(prev => !prev);
 
   const navItems = [
     { name: 'Market Overview', path: '/', icon: <FiPieChart /> },
     { name: 'Competitors', path: '/competitors', icon: <FiUsers /> },
     { name: 'SWOT Engine', path: '/swot', icon: <FiActivity /> },
+    { name: 'Market Trends', path: '/trends', icon: <FiTrendingUp /> },
+    { name: 'Analytics', path: '/analytics', icon: <FiBarChart2 /> },
+    { name: 'Settings', path: '/settings', icon: <FiSettings /> },
   ];
 
+  // Generate initials for avatar
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  };
+
+  // Match route — handle /competitor/:id as part of Competitors
+  const getActiveItem = () => {
+    if (location.pathname.startsWith('/competitor/')) return 'Competitors';
+    return navItems.find(item => item.path === location.pathname)?.name || 'Dashboard';
+  };
+
   return (
-    <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col shadow-sm">
-        <div className="h-16 flex items-center px-6 border-b border-slate-200">
-          <h1 className="text-xl font-bold text-brand-900 tracking-tight">AgTech Intel</h1>
+      <aside className={`sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div className="sidebar-logo">
+          <div className="sidebar-logo-icon">
+            <FiActivity />
+          </div>
+          {!isCollapsed && <span className="sidebar-logo-text">AgTech Intel</span>}
         </div>
-        <nav className="flex-1 p-4 space-y-1">
+
+        <nav className="sidebar-nav">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path;
+            const isActive = item.path === '/'
+              ? location.pathname === '/'
+              : location.pathname.startsWith(item.path);
             return (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
-                  isActive
-                    ? 'bg-brand-50 text-brand-600 font-medium'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                className={`nav-item ${isActive ? 'active' : ''}`}
+                title={isCollapsed ? item.name : undefined}
               >
-                {item.icon}
-                {item.name}
+                <span className="nav-item-icon">{item.icon}</span>
+                {!isCollapsed && <span className="nav-item-label">{item.name}</span>}
               </Link>
             );
           })}
         </nav>
+
+        {/* Sidebar footer — collapse toggle */}
+        <div className="sidebar-footer">
+          <button className="sidebar-toggle-btn" onClick={toggleSidebar} title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}>
+            <FiChevronLeft className={`sidebar-toggle-icon ${isCollapsed ? 'rotated' : ''}`} />
+            {!isCollapsed && <span>Collapse</span>}
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-8 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-800">
-            {navItems.find(item => item.path === location.pathname)?.name || 'Dashboard'}
-          </h2>
+      <div className="main-content">
+        <header className="app-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button className="header-menu-btn" onClick={toggleSidebar} title="Toggle sidebar">
+              <FiMenu />
+            </button>
+            <h2 className="app-header-title">
+              {getActiveItem()}
+            </h2>
+          </div>
+
+          <div className="app-header-right">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div className="header-status-dot" />
+              <span className="header-status-text">Live Data</span>
+            </div>
+
+            {/* Notification bell */}
+            <button className="header-notification-btn" title="Notifications">
+              <FiBell />
+              {hasNotification && <span className="notification-dot" />}
+            </button>
+
+            {/* User info */}
+            <div className="header-user-info">
+              {user?.avatar ? (
+                <img src={user.avatar} alt={user.name} className="header-avatar-img" referrerPolicy="no-referrer" />
+              ) : (
+                <div className="header-avatar">{getInitials(user?.name)}</div>
+              )}
+              <span className="header-user-name">{user?.name}</span>
+            </div>
+
+            <button className="header-logout-btn" onClick={logout} title="Sign out">
+              <FiLogOut />
+            </button>
+          </div>
         </header>
-        
-        {/* Dynamic Page Content Rendered Here */}
-        <div className="flex-1 overflow-auto p-8">
+
+        {/* Animated background mesh */}
+        <div className="content-bg-mesh" />
+
+        {/* Dynamic Page Content */}
+        <div className="content-area">
           <Outlet />
         </div>
-      </main>
+      </div>
     </div>
   );
 };

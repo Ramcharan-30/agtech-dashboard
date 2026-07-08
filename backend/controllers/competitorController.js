@@ -40,3 +40,45 @@ export const createCompetitor = async (req, res) => {
     res.status(400).json({ message: 'Invalid competitor data', error: error.message });
   }
 };
+
+// @desc    Update an existing competitor
+// @route   PUT /api/competitors/:id
+// @access  Public
+export const updateCompetitor = async (req, res) => {
+  try {
+    const competitor = await Competitor.findById(req.params.id);
+
+    if (!competitor) {
+      return res.status(404).json({ message: 'Competitor not found' });
+    }
+
+    const updatedCompetitor = await Competitor.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json(updatedCompetitor);
+  } catch (error) {
+    res.status(400).json({ message: 'Failed to update competitor', error: error.message });
+  }
+};
+
+// @desc    Delete a competitor
+// @route   DELETE /api/competitors/:id
+// @access  Public
+export const deleteCompetitor = async (req, res) => {
+  try {
+    const competitor = await Competitor.findById(req.params.id);
+
+    if (!competitor) {
+      return res.status(404).json({ message: 'Competitor not found' });
+    }
+
+    await Competitor.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: 'Competitor removed successfully', id: req.params.id });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete competitor', error: error.message });
+  }
+};
