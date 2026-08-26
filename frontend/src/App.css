@@ -36,18 +36,7 @@
 }
 
 .sidebar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 1px;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(16, 185, 129, 0.15) 50%,
-    transparent
-  );
+  display: none;
 }
 
 .sidebar-logo {
@@ -63,13 +52,12 @@
   width: 34px;
   height: 34px;
   border-radius: var(--radius-md);
-  background: var(--accent-gradient);
+  background: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  color: white;
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.2);
+  color: var(--bg-primary);
   flex-shrink: 0;
 }
 
@@ -77,10 +65,7 @@
   font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
 }
 
 .sidebar-nav {
@@ -111,8 +96,8 @@
 }
 
 .nav-item.active {
-  color: var(--text-accent);
-  background: var(--accent-glow);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
 }
 
 .nav-item.active::before {
@@ -123,8 +108,7 @@
   bottom: 8px;
   width: 3px;
   border-radius: 99px;
-  background: var(--accent-gradient);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  background: var(--text-primary);
 }
 
 .nav-item-icon {
@@ -167,8 +151,6 @@
   height: 8px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-  animation: pulseGlow 2s ease-in-out infinite;
 }
 
 .header-status-text {
@@ -225,12 +207,7 @@
 }
 
 .notification-dot::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 50%;
-  background: rgba(239, 68, 68, 0.3);
-  animation: pulseRing 1.5s ease-out infinite;
+  display: none;
 }
 
 /* ─── Main Content ─── */
@@ -291,9 +268,9 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--accent-gradient);
+  background: var(--text-primary);
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
 .kpi-card:hover::before {
@@ -683,19 +660,16 @@
 .swot-card::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: var(--radius-lg);
-  padding: 1px;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
 }
 
-.swot-card.strengths::before { background: linear-gradient(135deg, rgba(16, 185, 129, 0.4), transparent 60%); }
-.swot-card.weaknesses::before { background: linear-gradient(135deg, rgba(244, 63, 94, 0.4), transparent 60%); }
-.swot-card.opportunities::before { background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), transparent 60%); }
-.swot-card.threats::before { background: linear-gradient(135deg, rgba(245, 158, 11, 0.4), transparent 60%); }
+.swot-card.strengths::before { background: #10b981; }
+.swot-card.weaknesses::before { background: #ef4444; }
+.swot-card.opportunities::before { background: #3b82f6; }
+.swot-card.threats::before { background: #f59e0b; }
 
 .swot-card-header {
   display: flex;
@@ -778,20 +752,19 @@
   width: 56px;
   height: 56px;
   border-radius: var(--radius-md);
-  background: var(--accent-gradient);
-  color: white;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-default);
   font-size: 1.5rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 12px;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
 }
 
 .comparison-avatar.alt {
-  background: linear-gradient(135deg, #8b5cf6, #6366f1);
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.2);
+  background: var(--bg-secondary);
 }
 
 .comparison-name {
