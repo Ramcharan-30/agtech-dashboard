@@ -1,9 +1,8 @@
 import mongoose from 'mongoose';
 
 // Cache the connection across serverless function invocations.
-// In a long-running server this is irrelevant, but on Vercel each warm
-// invocation reuses the same Node.js module — caching avoids exhausting
-// MongoDB Atlas's connection limit.
+// On Vercel each warm invocation reuses the same Node.js module —
+// caching avoids exhausting MongoDB Atlas connection limits.
 let cached = global._mongoose;
 
 if (!cached) {
@@ -16,11 +15,9 @@ const connectDB = async () => {
   }
 
   if (!cached.promise) {
-    cached.promise = mongoose
-      .connect(process.env.MONGO_URI, {
-        serverSelectionTimeoutMS: 5000,
-      })
-      .then((mongoose) => mongoose);
+    cached.promise = mongoose.connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
   }
 
   try {
@@ -28,11 +25,12 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${cached.conn.connection.host}`);
   } catch (error) {
     cached.promise = null; // Reset so next invocation retries
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
+    // Throw instead of process.exit — lets the caller/middleware handle it
+    throw new Error(`MongoDB connection failed: ${error.message}`);
   }
 
   return cached.conn;
 };
 
-export default connectDB;
+export default connectDB;
+

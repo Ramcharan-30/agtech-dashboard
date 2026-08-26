@@ -7,7 +7,6 @@ import swotRoutes from './routes/swotRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
-connectDB();
 
 const app = express();
 
@@ -32,13 +31,26 @@ app.use(
 
 app.use(express.json());
 
+// Connect to DB on every request (cached after first connection).
+// This is the correct pattern for serverless — avoids fire-and-forget
+// at module load time which can crash the function container.
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('DB connection error:', error.message);
+    res.status(503).json({ message: 'Database unavailable. Please try again.' });
+  }
+});
+
 // Mount Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/competitors', competitorRoutes);
 app.use('/api/swot', swotRoutes);
 
 app.get('/', (req, res) => {
-  res.send('AgTech Market Intelligence API is running...');
+  res.json({ message: 'AgTech Market Intelligence API is running.' });
 });
 
 // Only start the HTTP server when running locally (not on Vercel)
